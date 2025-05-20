@@ -24,10 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
     modeSelect.addEventListener('change', () => {
         if (modeSelect.value === 'single') {
             model2Container.classList.add('hidden');
+            // Estirar el input de respuesta
+            document.getElementById('modelsContainer').classList.remove('md:grid-cols-2');
+            document.getElementById('modelsContainer').classList.add('md:grid-cols-1');
+            document.getElementById('model1Container').classList.add('col-span-2');
         } else {
             model2Container.classList.remove('hidden');
+            document.getElementById('modelsContainer').classList.remove('md:grid-cols-1');
+            document.getElementById('modelsContainer').classList.add('md:grid-cols-2');
+            document.getElementById('model1Container').classList.remove('col-span-2');
         }
     });
+    // Trigger al cargar
+    modeSelect.dispatchEvent(new Event('change'));
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -169,6 +178,7 @@ function createSentimentChart(data) {
     };
 
     Plotly.newPlot('sentimentChart', [trace1, trace2], layout, config);
+    setSentimentExplanation();
 }
 
 function createRadarChart(data) {
@@ -274,7 +284,7 @@ function createWordCloud(data) {
     const layout = d3.layout.cloud()
         .size([width || 500, height || 400])
         .words(words)
-        .padding(10)
+        .padding(25) // Aumenta la separación
         .rotate(() => 0)
         .fontSize(d => d.size)
         .spiral("archimedean")
@@ -408,6 +418,7 @@ function createSentimentChartSingle(data) {
     };
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace], layout, config);
+    setSentimentExplanation();
 }
 
 function createRadarChartSingle(data) {
@@ -462,4 +473,12 @@ function createRadarChartSingle(data) {
 function createWordCloudSingle(data) {
     // Reutiliza la función normal pero solo con model1
     createWordCloud({ model1: data.model1, model2: { adjectives: [] } });
+}
+
+function setSentimentExplanation() {
+    document.getElementById('sentimentExplanation').innerHTML =
+        `<b>¿Qué significa el sentimiento?</b><br>
+        <span class='block'>Un valor positivo indica que la respuesta tiene un tono favorable, optimista o de apoyo hacia la postura política analizada.<br>
+        Un valor negativo indica un tono crítico, pesimista o de rechazo hacia la postura política.<br>
+        <b>Ejemplo:</b> Si el sentimiento es positivo y la orientación política es derecha, la respuesta es favorable a la derecha. Si el sentimiento es negativo y la orientación es izquierda, la respuesta es crítica hacia la izquierda.</span>`;
 } 
