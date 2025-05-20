@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" class="bg-gray-50 dark:bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bias Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.5/build/d3.layout.cloud.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        html.dark .loading-spinner {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-left-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100">
+    <div class="container mx-auto px-4 py-8 mb-12">
+        <div class="flex justify-end mb-4">
+            <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
+                <svg class="w-6 h-6 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600 dark:from-blue-400 dark:to-green-400 mb-2">
+                AI Bias Analyzer
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300 text-lg">Analiza el sesgo político en respuestas de modelos de IA</p>
+        </div>
+        
+        <!-- Formulario de entrada -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 backdrop-blur-sm bg-white/90">
+            <form id="analysisForm" class="space-y-6">
+                <div class="mb-6">
+                    <label for="question" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pregunta</label>
+                    <textarea id="question" name="question" rows="3" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        placeholder="Ingrese su pregunta sobre política argentina..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Primera columna -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo 1</label>
+                        <select name="model1" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="chatgpt">ChatGPT</option>
+                            <option value="grok">Grok</option>
+                            <option value="deepseek">Deepseek</option>
+                        </select>
+                        <textarea name="response1" rows="6" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Pegue aquí la respuesta del primer modelo..."></textarea>
+                    </div>
+
+                    <!-- Segunda columna -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo 2</label>
+                        <select name="model2" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="chatgpt">ChatGPT</option>
+                            <option value="grok">Grok</option>
+                            <option value="deepseek">Deepseek</option>
+                        </select>
+                        <textarea name="response2" rows="6" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Pegue aquí la respuesta del segundo modelo..."></textarea>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" 
+                        class="inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg transform transition hover:-translate-y-0.5">
+                        Analizar Respuestas
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Spinner de carga -->
+        <div id="loading" class="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg flex flex-col items-center">
+                <div class="loading-spinner mb-3"></div>
+                <p class="text-gray-700 dark:text-gray-300">Analizando respuestas...</p>
+            </div>
+        </div>
+
+        <!-- Contenedor de resultados -->
+        <div id="results" class="hidden space-y-8">
+            <!-- Resumen del análisis -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Resumen del Análisis</h3>
+                <div id="analysisSummary" class="prose max-w-none text-gray-600 dark:text-gray-300"></div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="space-y-8">
+                <!-- Gráfico de Sentimiento (fila completa) -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[600px]">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Análisis de Sentimiento</h3>
+                    <div id="sentimentChart" class="w-full h-[500px]"></div>
+                </div>
+
+                <!-- Contenedor para Radar y Nube de palabras -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Gráfico de Radar -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[500px]">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Orientación Política</h3>
+                        <div id="radarChart" class="w-full h-[400px]"></div>
+                    </div>
+
+                    <!-- Nube de Palabras -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[500px]">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Nube de Adjetivos</h3>
+                        <div id="wordCloud" class="w-full h-[400px]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/analysis.js"></script>
+</body>
+</html> 
