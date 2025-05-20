@@ -64,13 +64,20 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 backdrop-blur-sm bg-white/90">
             <form id="analysisForm" class="space-y-6">
                 <div class="mb-6">
+                    <label for="mode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Modo de análisis</label>
+                    <select id="mode" name="mode" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="compare">Comparar dos modelos</option>
+                        <option value="single">Analizar un solo modelo</option>
+                    </select>
+                </div>
+                <div class="mb-6">
                     <label for="question" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pregunta</label>
                     <textarea id="question" name="question" rows="3" 
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         placeholder="Ingrese su pregunta sobre política argentina..."></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="modelsContainer">
                     <!-- Primera columna -->
                     <div class="space-y-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo 1</label>
@@ -85,7 +92,7 @@
                     </div>
 
                     <!-- Segunda columna -->
-                    <div class="space-y-4">
+                    <div class="space-y-4" id="model2Container">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo 2</label>
                         <select name="model2" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="chatgpt">ChatGPT</option>

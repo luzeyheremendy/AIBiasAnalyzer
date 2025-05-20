@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const results = document.getElementById('results');
     const loading = document.getElementById('loading');
     const darkModeToggle = document.getElementById('darkModeToggle');
+    const modeSelect = document.getElementById('mode');
+    const model2Container = document.getElementById('model2Container');
 
     // Dark mode handling
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -18,51 +20,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Mostrar/ocultar inputs según modo
+    modeSelect.addEventListener('change', () => {
+        if (modeSelect.value === 'single') {
+            model2Container.classList.add('hidden');
+        } else {
+            model2Container.classList.remove('hidden');
+        }
+    });
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Mostrar spinner
         loading.classList.remove('hidden');
         results.classList.add('hidden');
         
         const formData = new FormData(form);
-        
+        // Si es modo single, borra los campos del segundo modelo
+        if (modeSelect.value === 'single') {
+            formData.set('model2', '');
+            formData.set('response2', '');
+        }
         try {
             const response = await fetch('/analyze', {
                 method: 'POST',
                 body: formData
             });
-            
             const data = await response.json();
-            
             if (data.error) {
                 alert('Error al analizar las respuestas: ' + data.error);
                 return;
             }
-            
-            // Mostrar resultados
             results.classList.remove('hidden');
-            
-            // Mostrar el resumen
             document.getElementById('analysisSummary').innerHTML = data.summary;
-            
-            // Crear gráfico de sentimiento
-            createSentimentChart(data);
-            
-            // Crear gráfico de radar
-            createRadarChart(data);
-            
-            // Crear nube de palabras
-            createWordCloud(data);
-            
-            // Scroll suave hacia los resultados
+            // Si es análisis único, adapta los gráficos
+            if (modeSelect.value === 'single') {
+                createSentimentChartSingle(data);
+                createRadarChartSingle(data);
+                createWordCloudSingle(data);
+            } else {
+                createSentimentChart(data);
+                createRadarChart(data);
+                createWordCloud(data);
+            }
             results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
         } catch (error) {
             console.error('Error:', error);
             alert('Error al procesar la solicitud');
         } finally {
-            // Ocultar spinner
             loading.classList.add('hidden');
         }
     });
@@ -340,4 +345,121 @@ function updateCharts() {
             model2: { adjectives: [] }
         });
     }
+}
+
+// Gráficos para modo single
+function createSentimentChartSingle(data) {
+    const colors = getChartColors();
+    const trace = {
+        x: ['Sentimiento', 'Orientación Política'],
+        y: [data.model1.sentiment, data.model1.political_orientation],
+        name: document.querySelector('[name="model1"]').value,
+        type: 'bar',
+        marker: { color: colors.blue },
+        text: [
+            data.model1.sentiment.toFixed(2),
+            data.model1.political_orientation.toFixed(2)
+        ],
+        textposition: 'auto',
+    };
+    const layout = {
+        barmode: 'group',
+        autosize: true,
+        yaxis: {
+            range: [-1, 1],
+            title: {
+                text: 'Escala (-1 a 1)',
+                font: { size: 14 }
+            },
+            gridcolor: colors.grid,
+            color: colors.text,
+            zerolinecolor: colors.grid,
+            zerolinewidth: 2
+        },
+        xaxis: {
+            color: colors.text,
+            title: {
+                text: 'Métricas de Análisis',
+                font: { size: 14 }
+            }
+        },
+        height: 500,
+        margin: { t: 50, r: 50, l: 80, b: 120 },
+        plot_bgcolor: colors.background,
+        paper_bgcolor: colors.background,
+        font: { color: colors.text },
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.4, xanchor: 'center', x: 0.5 },
+        annotations: [
+            {
+                x: 'Sentimiento',
+                y: -1.3,
+                text: 'Negativo (-1) a Positivo (1)',
+                showarrow: false,
+                font: { color: colors.text, size: 12 }
+            },
+            {
+                x: 'Orientación Política',
+                y: -1.3,
+                text: 'Izquierda (-1) a Derecha (1)',
+                showarrow: false,
+                font: { color: colors.text, size: 12 }
+            }
+        ]
+    };
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot('sentimentChart', [trace], layout, config);
+}
+
+function createRadarChartSingle(data) {
+    const colors = getChartColors();
+    const model1Name = document.querySelector('[name="model1"]').value;
+    const trace = {
+        type: 'scatterpolar',
+        r: [
+            Math.abs(data.model1.sentiment),
+            Math.abs(data.model1.political_orientation),
+            data.model1.main_topics.length / 3,
+            data.model1.adjectives.length / 5
+        ],
+        theta: [
+            'Intensidad del Sentimiento',
+            'Intensidad Ideológica',
+            'Diversidad de Temas',
+            'Riqueza de Lenguaje'
+        ],
+        fill: 'toself',
+        name: model1Name,
+        line: { color: colors.blue }
+    };
+    const layout = {
+        autosize: true,
+        polar: {
+            radialaxis: {
+                visible: true,
+                range: [0, 1],
+                color: colors.text,
+                gridcolor: colors.grid,
+                ticksuffix: '',
+                tickfont: { size: 10 }
+            },
+            angularaxis: {
+                color: colors.text,
+                gridcolor: colors.grid
+            }
+        },
+        showlegend: true,
+        height: 400,
+        margin: { t: 30, r: 80, l: 80, b: 60 },
+        paper_bgcolor: colors.background,
+        plot_bgcolor: colors.background,
+        font: { color: colors.text },
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.2, xanchor: 'center', x: 0.5 }
+    };
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot('radarChart', [trace], layout, config);
+}
+
+function createWordCloudSingle(data) {
+    // Reutiliza la función normal pero solo con model1
+    createWordCloud({ model1: data.model1, model2: { adjectives: [] } });
 } 
