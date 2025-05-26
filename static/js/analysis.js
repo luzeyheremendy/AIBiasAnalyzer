@@ -102,8 +102,9 @@ function createSentimentChart(data) {
     const model1Name = document.querySelector('[name="model1"]').value;
     const model2Name = document.querySelector('[name="model2"]').value;
 
+    const xLabels = ['Sentimiento Total', 'Magnitud'];
     const trace1 = {
-        x: ['Sentimiento Total', 'Magnitud'],
+        x: xLabels,
         y: [data.model1.sentiment, data.model1.magnitude],
         name: model1Name,
         type: 'bar',
@@ -112,11 +113,11 @@ function createSentimentChart(data) {
             data.model1.sentiment.toFixed(2),
             data.model1.magnitude.toFixed(2)
         ],
-        textposition: 'auto',
+        textposition: 'outside',
+        hovertemplate: '%{x}: %{y:.2f}<extra>' + model1Name + '</extra>'
     };
-
     const trace2 = {
-        x: ['Sentimiento Total', 'Magnitud'],
+        x: xLabels,
         y: [data.model2.sentiment, data.model2.magnitude],
         name: model2Name,
         type: 'bar',
@@ -125,9 +126,9 @@ function createSentimentChart(data) {
             data.model2.sentiment.toFixed(2),
             data.model2.magnitude.toFixed(2)
         ],
-        textposition: 'auto',
+        textposition: 'outside',
+        hovertemplate: '%{x}: %{y:.2f}<extra>' + model2Name + '</extra>'
     };
-
     const layout = {
         barmode: 'group',
         autosize: true,
@@ -139,14 +140,17 @@ function createSentimentChart(data) {
             gridcolor: colors.grid,
             color: colors.text,
             zerolinecolor: colors.grid,
-            zerolinewidth: 2
+            zerolinewidth: 2,
+            rangemode: 'tozero',
+            automargin: true
         },
         xaxis: {
             color: colors.text,
             title: {
-                text: 'Métricas de Sentimiento',
+                text: '',
                 font: { size: 14 }
-            }
+            },
+            tickfont: { size: 15 }
         },
         height: 400,
         margin: { t: 50, r: 50, l: 80, b: 80 },
@@ -159,38 +163,41 @@ function createSentimentChart(data) {
             y: -0.3,
             xanchor: 'center',
             x: 0.5
-        }
+        },
+        showlegend: true,
+        uniformtext: { mode: 'hide', minsize: 12 }
     };
-
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace1, trace2], layout, config);
-    setSentimentExplanation();
+    // Mostrar conclusión automática
+    document.getElementById('sentimentConclusion').innerHTML = `<b>Conclusión:</b> ${data.summary}`;
 }
 
 function createRadarChart(data) {
     const colors = getChartColors();
     const model1Name = document.querySelector('[name="model1"]').value;
     const model2Name = document.querySelector('[name="model2"]').value;
-
+    const thetaLabels = [
+        'Intensidad Ideológica',
+        'Polarización del Lenguaje',
+        'Diversidad de Temas',
+        'Riqueza de Argumentación'
+    ];
     const trace1 = {
         type: 'scatterpolar',
         r: [
-            Math.abs(data.model1.political_orientation), // Intensidad ideológica
-            Math.abs(data.model1.sentiment), // Polarización del lenguaje
-            Math.min(1, data.model1.main_topics.length / 3), // Diversidad de temas
-            Math.min(1, data.model1.adjectives.length / 5) // Riqueza de argumentación
+            Math.abs(data.model1.political_orientation),
+            Math.abs(data.model1.sentiment),
+            Math.min(1, data.model1.main_topics.length / 3),
+            Math.min(1, data.model1.adjectives.length / 5)
         ],
-        theta: [
-            'Intensidad Ideológica',
-            'Polarización del Lenguaje',
-            'Diversidad de Temas',
-            'Riqueza de Argumentación'
-        ],
+        theta: thetaLabels,
         fill: 'toself',
         name: model1Name,
-        line: { color: colors.blue }
+        line: { color: colors.blue },
+        marker: { size: 8 },
+        hovertemplate: '%{theta}: %{r:.2f}<extra>' + model1Name + '</extra>'
     };
-
     const trace2 = {
         type: 'scatterpolar',
         r: [
@@ -199,17 +206,13 @@ function createRadarChart(data) {
             Math.min(1, data.model2.main_topics.length / 3),
             Math.min(1, data.model2.adjectives.length / 5)
         ],
-        theta: [
-            'Intensidad Ideológica',
-            'Polarización del Lenguaje',
-            'Diversidad de Temas',
-            'Riqueza de Argumentación'
-        ],
+        theta: thetaLabels,
         fill: 'toself',
         name: model2Name,
-        line: { color: colors.green }
+        line: { color: colors.green },
+        marker: { size: 8 },
+        hovertemplate: '%{theta}: %{r:.2f}<extra>' + model2Name + '</extra>'
     };
-
     const layout = {
         autosize: true,
         polar: {
@@ -218,12 +221,15 @@ function createRadarChart(data) {
                 range: [0, 1],
                 color: colors.text,
                 gridcolor: colors.grid,
-                ticksuffix: '',
-                tickfont: { size: 10 }
+                tickfont: { size: 13 },
+                angle: 90,
+                automargin: true
             },
             angularaxis: {
                 color: colors.text,
-                gridcolor: colors.grid
+                gridcolor: colors.grid,
+                tickfont: { size: 14 },
+                automargin: true
             }
         },
         showlegend: true,
@@ -238,12 +244,11 @@ function createRadarChart(data) {
             y: -0.2, 
             xanchor: 'center', 
             x: 0.5 
-        }
+        },
+        uniformtext: { mode: 'hide', minsize: 12 }
     };
-
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('radarChart', [trace1, trace2], layout, config);
-    setRadarExplanation();
 }
 
 function createWordCloud(data) {
@@ -381,7 +386,6 @@ function createSentimentChartSingle(data) {
     };
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace], layout, config);
-    setSentimentExplanation();
 }
 
 function createRadarChartSingle(data) {
@@ -436,28 +440,6 @@ function createRadarChartSingle(data) {
 function createWordCloudSingle(data) {
     // Reutiliza la función normal pero solo con model1
     createWordCloud({ model1: data.model1, model2: { adjectives: [] } });
-}
-
-function setSentimentExplanation() {
-    document.getElementById('sentimentExplanation').innerHTML =
-        `<b>¿Qué significan estas métricas?</b><br>
-        <span class='block mt-2'>
-        <b>Sentimiento Total:</b> Valor entre -1 (muy negativo) y 1 (muy positivo). Indica el tono general de la respuesta.<br>
-        <b>Magnitud:</b> Mide la intensidad emocional total, siempre positiva. Un valor alto indica mayor carga emocional, aunque sea mixta.<br>
-        <b>Conclusión:</b> Una respuesta puede ser neutral (sentimiento ≈ 0) pero con magnitud alta si expresa emociones intensas tanto positivas como negativas. Esto sugiere un lenguaje más polarizado o emocional.
-        </span>`;
-}
-
-function setRadarExplanation() {
-    document.getElementById('radarExplanation').innerHTML =
-        `<b>¿Qué significan estas métricas?</b><br>
-        <span class='block mt-2'>
-        <b>Intensidad Ideológica:</b> Mide qué tan fuerte es la postura política (valor absoluto de la orientación).<br>
-        <b>Polarización del Lenguaje:</b> Indica qué tan polarizado es el tono del texto (valor absoluto del sentimiento).<br>
-        <b>Diversidad de Temas:</b> Muestra la variedad de temas abordados (normalizado según cantidad máxima).<br>
-        <b>Riqueza de Argumentación:</b> Indica la complejidad del lenguaje usado (basado en cantidad de adjetivos).<br>
-        <b>Conclusión:</b> Un área más grande en el radar sugiere una respuesta más completa y elaborada, mientras que una forma más irregular indica sesgos específicos en ciertos aspectos.
-        </span>`;
 }
 
 // NUEVO: Gráfico de Compass Político (cuadrantes)
