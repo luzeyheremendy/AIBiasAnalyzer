@@ -62,13 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             results.classList.remove('hidden');
             document.getElementById('analysisSummary').innerHTML = data.summary;
-            // Si es análisis único, adapta los gráficos
             if (modeSelect.value === 'single') {
                 createSentimentChartSingle(data);
+                createPoliticalChartSingle(data);
                 createRadarChartSingle(data);
                 createWordCloudSingle(data);
             } else {
                 createSentimentChart(data);
+                createPoliticalChart(data);
                 createRadarChart(data);
                 createWordCloud(data);
             }
@@ -98,38 +99,35 @@ function getChartColors() {
 function createSentimentChart(data) {
     const colors = getChartColors();
     const trace1 = {
-        x: ['Sentimiento', 'Orientación Política'],
-        y: [data.model1.sentiment, data.model1.political_orientation],
+        x: ['Sentimiento', 'Magnitud'],
+        y: [data.model1.sentiment, data.model1.magnitude],
         name: document.querySelector('[name="model1"]').value,
         type: 'bar',
         marker: { color: colors.blue },
         text: [
             data.model1.sentiment.toFixed(2),
-            data.model1.political_orientation.toFixed(2)
+            data.model1.magnitude.toFixed(2)
         ],
         textposition: 'auto',
     };
-
     const trace2 = {
-        x: ['Sentimiento', 'Orientación Política'],
-        y: [data.model2.sentiment, data.model2.political_orientation],
+        x: ['Sentimiento', 'Magnitud'],
+        y: [data.model2.sentiment, data.model2.magnitude],
         name: document.querySelector('[name="model2"]').value,
         type: 'bar',
         marker: { color: colors.green },
         text: [
             data.model2.sentiment.toFixed(2),
-            data.model2.political_orientation.toFixed(2)
+            data.model2.magnitude.toFixed(2)
         ],
         textposition: 'auto',
     };
-
     const layout = {
         barmode: 'group',
         autosize: true,
         yaxis: {
-            range: [-1, 1],
             title: {
-                text: 'Escala (-1 a 1)',
+                text: 'Valor',
                 font: { size: 14 }
             },
             gridcolor: colors.grid,
@@ -140,45 +138,40 @@ function createSentimentChart(data) {
         xaxis: {
             color: colors.text,
             title: {
-                text: 'Métricas de Análisis',
+                text: 'Métricas de Sentimiento',
                 font: { size: 14 }
             }
         },
-        height: 500,
-        margin: { t: 50, r: 50, l: 80, b: 120 },
+        height: 350,
+        margin: { t: 50, r: 50, l: 80, b: 80 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
         legend: { 
             font: { color: colors.text },
             orientation: 'h',
-            y: -0.4,
+            y: -0.3,
             xanchor: 'center',
             x: 0.5
         },
         annotations: [
             {
                 x: 'Sentimiento',
-                y: -1.3,
-                text: 'Negativo (-1) a Positivo (1)',
+                y: -0.2,
+                text: 'Escala: -1 (negativo) a 1 (positivo)',
                 showarrow: false,
                 font: { color: colors.text, size: 12 }
             },
             {
-                x: 'Orientación Política',
-                y: -1.3,
-                text: 'Izquierda (-1) a Derecha (1)',
+                x: 'Magnitud',
+                y: -0.2,
+                text: 'Siempre positiva. Mayor valor = mayor carga emocional',
                 showarrow: false,
                 font: { color: colors.text, size: 12 }
             }
         ]
     };
-
-    const config = {
-        responsive: true,
-        displayModeBar: false
-    };
-
+    const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace1, trace2], layout, config);
     setSentimentExplanation();
 }
@@ -349,14 +342,14 @@ function updateCharts() {
 function createSentimentChartSingle(data) {
     const colors = getChartColors();
     const trace = {
-        x: ['Sentimiento', 'Orientación Política'],
-        y: [data.model1.sentiment, data.model1.political_orientation],
+        x: ['Sentimiento', 'Magnitud'],
+        y: [data.model1.sentiment, data.model1.magnitude],
         name: document.querySelector('[name="model1"]').value,
         type: 'bar',
         marker: { color: colors.blue },
         text: [
             data.model1.sentiment.toFixed(2),
-            data.model1.political_orientation.toFixed(2)
+            data.model1.magnitude.toFixed(2)
         ],
         textposition: 'auto',
     };
@@ -364,9 +357,8 @@ function createSentimentChartSingle(data) {
         barmode: 'group',
         autosize: true,
         yaxis: {
-            range: [-1, 1],
             title: {
-                text: 'Escala (-1 a 1)',
+                text: 'Valor',
                 font: { size: 14 }
             },
             gridcolor: colors.grid,
@@ -377,28 +369,28 @@ function createSentimentChartSingle(data) {
         xaxis: {
             color: colors.text,
             title: {
-                text: 'Métricas de Análisis',
+                text: 'Métricas de Sentimiento',
                 font: { size: 14 }
             }
         },
-        height: 500,
-        margin: { t: 50, r: 50, l: 80, b: 120 },
+        height: 350,
+        margin: { t: 50, r: 50, l: 80, b: 80 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
-        legend: { font: { color: colors.text }, orientation: 'h', y: -0.4, xanchor: 'center', x: 0.5 },
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 },
         annotations: [
             {
                 x: 'Sentimiento',
-                y: -1.3,
-                text: 'Negativo (-1) a Positivo (1)',
+                y: -0.2,
+                text: 'Escala: -1 (negativo) a 1 (positivo)',
                 showarrow: false,
                 font: { color: colors.text, size: 12 }
             },
             {
-                x: 'Orientación Política',
-                y: -1.3,
-                text: 'Izquierda (-1) a Derecha (1)',
+                x: 'Magnitud',
+                y: -0.2,
+                text: 'Siempre positiva. Mayor valor = mayor carga emocional',
                 showarrow: false,
                 font: { color: colors.text, size: 12 }
             }
@@ -466,21 +458,157 @@ function createWordCloudSingle(data) {
 function setSentimentExplanation() {
     document.getElementById('sentimentExplanation').innerHTML =
         `<b>¿Qué significa el sentimiento?</b><br>
-        <span class='block'>Un valor positivo indica que la respuesta tiene un tono favorable, optimista o de apoyo hacia la postura política analizada.<br>
-        Un valor negativo indica un tono crítico, pesimista o de rechazo hacia la postura política.<br>
-        <b>Ejemplo:</b> Si el sentimiento es positivo y la orientación política es derecha, la respuesta es favorable a la derecha. Si el sentimiento es negativo y la orientación es izquierda, la respuesta es crítica hacia la izquierda.</span>`;
+        <span class='block'>
+        <b>Sentimiento:</b> Valor entre -1 (muy negativo) y 1 (muy positivo). Indica el tono general de la respuesta.<br>
+        <b>Magnitud:</b> Mide la intensidad emocional total, siempre positiva. Un valor alto indica mayor carga emocional, aunque sea mixta.<br>
+        <b>Ejemplo:</b> Una respuesta puede ser neutral (sentimiento ≈ 0) pero con magnitud alta si expresa emociones intensas tanto positivas como negativas.
+        </span>`;
+}
+
+// NUEVO: Gráfico de Orientación Política (comparación)
+function createPoliticalChart(data) {
+    const colors = getChartColors();
+    const trace1 = {
+        x: ['Orientación Política'],
+        y: [data.model1.political_orientation],
+        name: document.querySelector('[name="model1"]').value,
+        type: 'bar',
+        marker: { color: colors.blue },
+        text: [data.model1.political_orientation.toFixed(2)],
+        textposition: 'auto',
+    };
+    const trace2 = {
+        x: ['Orientación Política'],
+        y: [data.model2.political_orientation],
+        name: document.querySelector('[name="model2"]').value,
+        type: 'bar',
+        marker: { color: colors.green },
+        text: [data.model2.political_orientation.toFixed(2)],
+        textposition: 'auto',
+    };
+    const layout = {
+        barmode: 'group',
+        autosize: true,
+        yaxis: {
+            range: [-1, 1],
+            title: {
+                text: 'Escala (-1 a 1)',
+                font: { size: 14 }
+            },
+            gridcolor: colors.grid,
+            color: colors.text,
+            zerolinecolor: colors.grid,
+            zerolinewidth: 2
+        },
+        xaxis: {
+            color: colors.text,
+            title: {
+                text: 'Orientación Política',
+                font: { size: 14 }
+            }
+        },
+        height: 200,
+        margin: { t: 30, r: 50, l: 80, b: 60 },
+        plot_bgcolor: colors.background,
+        paper_bgcolor: colors.background,
+        font: { color: colors.text },
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 },
+        annotations: [
+            {
+                x: 'Orientación Política',
+                y: -1.2,
+                text: 'Izquierda (-1) a Derecha (1)',
+                showarrow: false,
+                font: { color: colors.text, size: 12 }
+            }
+        ]
+    };
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot('politicalChart', [trace1, trace2], layout, config);
+    setPoliticalExplanation();
+}
+
+// NUEVO: Gráfico de Orientación Política (single)
+function createPoliticalChartSingle(data) {
+    const colors = getChartColors();
+    const trace = {
+        x: ['Orientación Política'],
+        y: [data.model1.political_orientation],
+        name: document.querySelector('[name="model1"]').value,
+        type: 'bar',
+        marker: { color: colors.blue },
+        text: [data.model1.political_orientation.toFixed(2)],
+        textposition: 'auto',
+    };
+    const layout = {
+        barmode: 'group',
+        autosize: true,
+        yaxis: {
+            range: [-1, 1],
+            title: {
+                text: 'Escala (-1 a 1)',
+                font: { size: 14 }
+            },
+            gridcolor: colors.grid,
+            color: colors.text,
+            zerolinecolor: colors.grid,
+            zerolinewidth: 2
+        },
+        xaxis: {
+            color: colors.text,
+            title: {
+                text: 'Orientación Política',
+                font: { size: 14 }
+            }
+        },
+        height: 200,
+        margin: { t: 30, r: 50, l: 80, b: 60 },
+        plot_bgcolor: colors.background,
+        paper_bgcolor: colors.background,
+        font: { color: colors.text },
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 },
+        annotations: [
+            {
+                x: 'Orientación Política',
+                y: -1.2,
+                text: 'Izquierda (-1) a Derecha (1)',
+                showarrow: false,
+                font: { color: colors.text, size: 12 }
+            }
+        ]
+    };
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot('politicalChart', [trace], layout, config);
+    setPoliticalExplanation();
+}
+
+// NUEVO: Explicación para orientación política
+function setPoliticalExplanation() {
+    document.getElementById('politicalExplanation').innerHTML =
+        `<b>¿Qué significa la orientación política?</b><br>
+        <span class='block'>
+        Valor entre -1 (izquierda) y 1 (derecha). 0 indica centro o neutralidad.<br>
+        <b>Ejemplo:</b> Un valor cercano a -1 sugiere sesgo hacia la izquierda, mientras que un valor cercano a 1 indica sesgo hacia la derecha.<br>
+        <b>Contexto:</b> El análisis considera el espectro político argentino.
+        </span>`;
 }
 
 // Tooltips explicativos para los títulos de los gráficos
 function setGraphTooltips() {
     const tooltips = {
         'sentimentTitle': `\
-<b>Análisis de Sentimiento</b><br>
-Mide el tono general de la respuesta: positivo (apoyo, optimismo), negativo (crítica, rechazo) o neutral.<br>
-<b>Cálculo:</b> El modelo Gemini analiza el texto y asigna un valor entre -1 (muy negativo) y 1 (muy positivo) según el lenguaje y la actitud hacia la postura política.<br>
-<b>Ejemplo:</b> Si el sentimiento es positivo y la orientación es derecha, la respuesta es favorable a la derecha.`,
+<b>Análisis de Sentimiento y Magnitud</b><br>
+<b>Sentimiento:</b> Tono general de la respuesta, de -1 (muy negativo) a 1 (muy positivo).<br>
+<b>Magnitud:</b> Intensidad emocional total, siempre positiva. Un valor alto indica mayor carga emocional, aunque sea mixta.<br>
+<b>Cálculo:</b> El modelo Gemini analiza el texto y asigna ambos valores según el lenguaje y la actitud.<br>
+<b>Ejemplo:</b> Una respuesta puede ser neutral (sentimiento ≈ 0) pero con magnitud alta si expresa emociones intensas tanto positivas como negativas.`,
+        'politicalTitle': `\
+<b>Orientación Política</b><br>
+Mide el sesgo ideológico de la respuesta en el eje izquierda (-1) a derecha (1).<br>
+<b>Cálculo:</b> El modelo Gemini analiza el texto y asigna un valor según la postura política detectada.<br>
+<b>Ejemplo:</b> Un valor cercano a -1 sugiere sesgo hacia la izquierda, mientras que un valor cercano a 1 indica sesgo hacia la derecha.`,
         'radarTitle': `\
-<b>Orientación Política (Radar)</b><br>
+<b>Radar de Métricas</b><br>
 Compara varias métricas de la respuesta:<br>
 - <b>Intensidad del Sentimiento:</b> Valor absoluto del sentimiento (-1 a 1).<br>
 - <b>Intensidad Ideológica:</b> Valor absoluto de la orientación política (-1 a 1).<br>
@@ -496,6 +624,7 @@ Muestra los adjetivos más relevantes usados en las respuestas.<br>
     };
     [
         {id: 'sentimentTitle', selector: '#sentimentTitle'},
+        {id: 'politicalTitle', selector: '#politicalTitle'},
         {id: 'radarTitle', selector: '#radarTitle'},
         {id: 'wordCloudTitle', selector: '#wordCloudTitle'}
     ].forEach(({id, selector}) => {
