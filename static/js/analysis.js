@@ -7,13 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const model2Container = document.getElementById('model2Container');
 
     // Dark mode handling
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('darkMode') === 'true' || 
+        (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
     }
 
     darkModeToggle.addEventListener('click', () => {
         document.documentElement.classList.toggle('dark');
-        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
         // Actualizar gráficos si están visibles
         if (!results.classList.contains('hidden')) {
             updateCharts();
@@ -23,13 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mostrar/ocultar inputs según modo
     modeSelect.addEventListener('change', () => {
         if (modeSelect.value === 'single') {
-            model2Container.classList.add('hidden');
+            model2Container.style.display = 'none';
             // Estirar el input de respuesta
             document.getElementById('modelsContainer').classList.remove('md:grid-cols-2');
             document.getElementById('modelsContainer').classList.add('md:grid-cols-1');
             document.getElementById('model1Container').classList.add('col-span-2');
         } else {
-            model2Container.classList.remove('hidden');
+            model2Container.style.display = 'block';
             document.getElementById('modelsContainer').classList.remove('md:grid-cols-1');
             document.getElementById('modelsContainer').classList.add('md:grid-cols-2');
             document.getElementById('model1Container').classList.remove('col-span-2');
@@ -47,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(form);
         // Si es modo single, borra los campos del segundo modelo
         if (modeSelect.value === 'single') {
-            formData.set('model2', '');
-            formData.set('response2', '');
+            formData.delete('response2');
+            formData.delete('model2');
         }
         try {
             const response = await fetch('/analyze', {
@@ -98,10 +99,13 @@ function getChartColors() {
 
 function createSentimentChart(data) {
     const colors = getChartColors();
+    const model1Name = document.querySelector('[name="model1"]').value;
+    const model2Name = document.querySelector('[name="model2"]').value;
+
     const trace1 = {
-        x: ['Sentimiento', 'Magnitud'],
+        x: ['Sentimiento Total', 'Magnitud'],
         y: [data.model1.sentiment, data.model1.magnitude],
-        name: document.querySelector('[name="model1"]').value,
+        name: model1Name,
         type: 'bar',
         marker: { color: colors.blue },
         text: [
@@ -110,10 +114,11 @@ function createSentimentChart(data) {
         ],
         textposition: 'auto',
     };
+
     const trace2 = {
-        x: ['Sentimiento', 'Magnitud'],
+        x: ['Sentimiento Total', 'Magnitud'],
         y: [data.model2.sentiment, data.model2.magnitude],
-        name: document.querySelector('[name="model2"]').value,
+        name: model2Name,
         type: 'bar',
         marker: { color: colors.green },
         text: [
@@ -122,6 +127,7 @@ function createSentimentChart(data) {
         ],
         textposition: 'auto',
     };
+
     const layout = {
         barmode: 'group',
         autosize: true,
@@ -142,7 +148,7 @@ function createSentimentChart(data) {
                 font: { size: 14 }
             }
         },
-        height: 350,
+        height: 400,
         margin: { t: 50, r: 50, l: 80, b: 80 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
@@ -155,6 +161,7 @@ function createSentimentChart(data) {
             x: 0.5
         }
     };
+
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace1, trace2], layout, config);
     setSentimentExplanation();
@@ -168,16 +175,16 @@ function createRadarChart(data) {
     const trace1 = {
         type: 'scatterpolar',
         r: [
-            Math.abs(data.model1.sentiment),
-            Math.abs(data.model1.political_orientation),
-            Math.min(1, data.model1.main_topics.length / 3),
-            Math.min(1, data.model1.adjectives.length / 5)
+            Math.abs(data.model1.political_orientation), // Intensidad ideológica
+            Math.abs(data.model1.sentiment), // Polarización del lenguaje
+            Math.min(1, data.model1.main_topics.length / 3), // Diversidad de temas
+            Math.min(1, data.model1.adjectives.length / 5) // Riqueza de argumentación
         ],
         theta: [
-            'Intensidad del Sentimiento',
             'Intensidad Ideológica',
+            'Polarización del Lenguaje',
             'Diversidad de Temas',
-            'Riqueza de Lenguaje'
+            'Riqueza de Argumentación'
         ],
         fill: 'toself',
         name: model1Name,
@@ -187,16 +194,16 @@ function createRadarChart(data) {
     const trace2 = {
         type: 'scatterpolar',
         r: [
-            Math.abs(data.model2.sentiment),
             Math.abs(data.model2.political_orientation),
+            Math.abs(data.model2.sentiment),
             Math.min(1, data.model2.main_topics.length / 3),
             Math.min(1, data.model2.adjectives.length / 5)
         ],
         theta: [
-            'Intensidad del Sentimiento',
             'Intensidad Ideológica',
+            'Polarización del Lenguaje',
             'Diversidad de Temas',
-            'Riqueza de Lenguaje'
+            'Riqueza de Argumentación'
         ],
         fill: 'toself',
         name: model2Name,
@@ -225,10 +232,18 @@ function createRadarChart(data) {
         paper_bgcolor: colors.background,
         plot_bgcolor: colors.background,
         font: { color: colors.text },
-        legend: { font: { color: colors.text }, orientation: 'h', y: -0.2, xanchor: 'center', x: 0.5 }
+        legend: { 
+            font: { color: colors.text }, 
+            orientation: 'h', 
+            y: -0.2, 
+            xanchor: 'center', 
+            x: 0.5 
+        }
     };
+
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('radarChart', [trace1, trace2], layout, config);
+    setRadarExplanation();
 }
 
 function createWordCloud(data) {
@@ -425,11 +440,23 @@ function createWordCloudSingle(data) {
 
 function setSentimentExplanation() {
     document.getElementById('sentimentExplanation').innerHTML =
-        `<b>¿Qué significa el sentimiento?</b><br>
-        <span class='block'>
-        <b>Sentimiento:</b> Valor entre -1 (negativo) a 1 (positivo). Indica el tono general de la respuesta.<br>
+        `<b>¿Qué significan estas métricas?</b><br>
+        <span class='block mt-2'>
+        <b>Sentimiento Total:</b> Valor entre -1 (muy negativo) y 1 (muy positivo). Indica el tono general de la respuesta.<br>
         <b>Magnitud:</b> Mide la intensidad emocional total, siempre positiva. Un valor alto indica mayor carga emocional, aunque sea mixta.<br>
-        <b>Ejemplo:</b> Una respuesta puede ser neutral (sentimiento ≈ 0) pero con magnitud alta si expresa emociones intensas tanto positivas como negativas.
+        <b>Conclusión:</b> Una respuesta puede ser neutral (sentimiento ≈ 0) pero con magnitud alta si expresa emociones intensas tanto positivas como negativas. Esto sugiere un lenguaje más polarizado o emocional.
+        </span>`;
+}
+
+function setRadarExplanation() {
+    document.getElementById('radarExplanation').innerHTML =
+        `<b>¿Qué significan estas métricas?</b><br>
+        <span class='block mt-2'>
+        <b>Intensidad Ideológica:</b> Mide qué tan fuerte es la postura política (valor absoluto de la orientación).<br>
+        <b>Polarización del Lenguaje:</b> Indica qué tan polarizado es el tono del texto (valor absoluto del sentimiento).<br>
+        <b>Diversidad de Temas:</b> Muestra la variedad de temas abordados (normalizado según cantidad máxima).<br>
+        <b>Riqueza de Argumentación:</b> Indica la complejidad del lenguaje usado (basado en cantidad de adjetivos).<br>
+        <b>Conclusión:</b> Un área más grande en el radar sugiere una respuesta más completa y elaborada, mientras que una forma más irregular indica sesgos específicos en ciertos aspectos.
         </span>`;
 }
 
