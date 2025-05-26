@@ -80,6 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loading.classList.add('hidden');
         }
     });
+
+    setGraphTooltips();
 });
 
 function getChartColors() {
@@ -191,8 +193,8 @@ function createRadarChart(data) {
         r: [
             Math.abs(data.model1.sentiment),
             Math.abs(data.model1.political_orientation),
-            data.model1.main_topics.length / 3,
-            data.model1.adjectives.length / 5
+            Math.min(1, data.model1.main_topics.length / 3),
+            Math.min(1, data.model1.adjectives.length / 5)
         ],
         theta: [
             'Intensidad del Sentimiento',
@@ -210,8 +212,8 @@ function createRadarChart(data) {
         r: [
             Math.abs(data.model2.sentiment),
             Math.abs(data.model2.political_orientation),
-            data.model2.main_topics.length / 3,
-            data.model2.adjectives.length / 5
+            Math.min(1, data.model2.main_topics.length / 3),
+            Math.min(1, data.model2.adjectives.length / 5)
         ],
         theta: [
             'Intensidad del Sentimiento',
@@ -246,55 +248,44 @@ function createRadarChart(data) {
         paper_bgcolor: colors.background,
         plot_bgcolor: colors.background,
         font: { color: colors.text },
-        legend: { 
-            font: { color: colors.text },
-            orientation: 'h',
-            y: -0.2,
-            xanchor: 'center',
-            x: 0.5
-        }
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.2, xanchor: 'center', x: 0.5 }
     };
-
-    const config = {
-        responsive: true,
-        displayModeBar: false
-    };
-
+    const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('radarChart', [trace1, trace2], layout, config);
 }
 
 function createWordCloud(data) {
     const colors = getChartColors();
-    const allAdjectives = [...data.model1.adjectives, ...data.model2.adjectives];
-    
-    const wordFreq = allAdjectives.reduce((acc, word) => {
-        acc[word] = (acc[word] || 0) + 1;
-        return acc;
-    }, {});
-
-    const words = Object.entries(wordFreq).map(([text, size]) => ({
-        text,
-        size: size * 25 + 20,
-        model: data.model1.adjectives.includes(text) ? 'model1' : 'model2'
-    }));
-
+    // Mostrar adjetivos duplicados si aparecen en ambos modelos
+    const adj1 = data.model1.adjectives || [];
+    const adj2 = data.model2.adjectives || [];
+    let allAdjectives = [];
+    adj1.forEach(word => allAdjectives.push({text: word, model: 'model1'}));
+    adj2.forEach(word => allAdjectives.push({text: word, model: 'model2'}));
+    // Contar frecuencia por modelo
+    const wordFreq = {};
+    allAdjectives.forEach(({text, model}) => {
+        const key = text + '_' + model;
+        wordFreq[key] = (wordFreq[key] || 0) + 1;
+    });
+    // Convertir a formato necesario para d3-cloud
+    const words = Object.entries(wordFreq).map(([key, size]) => {
+        const [text, model] = key.split('_');
+        return {text, size: size * 25 + 20, model};
+    });
     const width = document.getElementById('wordCloud').clientWidth;
     const height = document.getElementById('wordCloud').clientHeight;
-
     const layout = d3.layout.cloud()
         .size([width || 500, height || 400])
         .words(words)
-        .padding(25) // Aumenta la separación
+        .padding(25)
         .rotate(() => 0)
         .fontSize(d => d.size)
         .spiral("archimedean")
         .on("end", draw);
-
     layout.start();
-
     function draw(words) {
         d3.select("#wordCloud").select("svg").remove();
-
         const svg = d3.select("#wordCloud")
             .append("svg")
             .attr("width", '100%')
@@ -304,15 +295,12 @@ function createWordCloud(data) {
             .style("background-color", colors.background)
             .append("g")
             .attr("transform", `translate(${(width || 500) / 2},${(height || 400) / 2})`);
-
-        // Agregar un rectángulo de fondo
         svg.append("rect")
             .attr("x", -(width || 500) / 2)
             .attr("y", -(height || 400) / 2)
             .attr("width", width || 500)
             .attr("height", height || 400)
             .attr("fill", colors.background);
-
         svg.selectAll("text")
             .data(words)
             .enter().append("text")
@@ -323,7 +311,7 @@ function createWordCloud(data) {
             .attr("text-anchor", "middle")
             .attr("transform", d => `translate(${d.x},${d.y})`)
             .text(d => d.text)
-            .append("title")  // Tooltip
+            .append("title")
             .text(d => `${d.text} (${d.model === 'model1' ? document.querySelector('[name="model1"]').value : document.querySelector('[name="model2"]').value})`);
     }
 }
@@ -481,4 +469,70 @@ function setSentimentExplanation() {
         <span class='block'>Un valor positivo indica que la respuesta tiene un tono favorable, optimista o de apoyo hacia la postura política analizada.<br>
         Un valor negativo indica un tono crítico, pesimista o de rechazo hacia la postura política.<br>
         <b>Ejemplo:</b> Si el sentimiento es positivo y la orientación política es derecha, la respuesta es favorable a la derecha. Si el sentimiento es negativo y la orientación es izquierda, la respuesta es crítica hacia la izquierda.</span>`;
+}
+
+// Tooltips explicativos para los títulos de los gráficos
+function setGraphTooltips() {
+    const tooltips = {
+        'sentimentTitle': `\
+<b>Análisis de Sentimiento</b><br>
+Mide el tono general de la respuesta: positivo (apoyo, optimismo), negativo (crítica, rechazo) o neutral.<br>
+<b>Cálculo:</b> El modelo Gemini analiza el texto y asigna un valor entre -1 (muy negativo) y 1 (muy positivo) según el lenguaje y la actitud hacia la postura política.<br>
+<b>Ejemplo:</b> Si el sentimiento es positivo y la orientación es derecha, la respuesta es favorable a la derecha.`,
+        'radarTitle': `\
+<b>Orientación Política (Radar)</b><br>
+Compara varias métricas de la respuesta:<br>
+- <b>Intensidad del Sentimiento:</b> Valor absoluto del sentimiento (-1 a 1).<br>
+- <b>Intensidad Ideológica:</b> Valor absoluto de la orientación política (-1 a 1).<br>
+- <b>Diversidad de Temas:</b> Cantidad de temas principales detectados (normalizado).<br>
+- <b>Riqueza de Lenguaje:</b> Cantidad de adjetivos detectados (normalizado).<br>
+<b>Cálculo:</b> Todas las métricas se normalizan entre 0 y 1 para comparar la "fuerza" de cada aspecto en la respuesta.`,
+        'wordCloudTitle': `\
+<b>Nube de Adjetivos</b><br>
+Muestra los adjetivos más relevantes usados en las respuestas.<br>
+<b>Cálculo:</b> El modelo Gemini extrae los adjetivos más representativos.<br>
+<b>Color:</b> Azul = Modelo 1, Verde = Modelo 2. Si un adjetivo aparece en ambos, se muestra dos veces (una por cada modelo).<br>
+<b>Tamaño:</b> Indica la frecuencia del adjetivo en la respuesta.`
+    };
+    [
+        {id: 'sentimentTitle', selector: '#sentimentTitle'},
+        {id: 'radarTitle', selector: '#radarTitle'},
+        {id: 'wordCloudTitle', selector: '#wordCloudTitle'}
+    ].forEach(({id, selector}) => {
+        const el = document.querySelector(selector);
+        if (el) {
+            el.setAttribute('title', '');
+            el.onmouseenter = (e) => {
+                showTooltip(e, tooltips[id]);
+            };
+            el.onmouseleave = hideTooltip;
+        }
+    });
+}
+
+function showTooltip(e, html) {
+    let tooltip = document.getElementById('customTooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'customTooltip';
+        tooltip.style.position = 'fixed';
+        tooltip.style.zIndex = 9999;
+        tooltip.style.background = 'rgba(30,41,59,0.95)';
+        tooltip.style.color = '#fff';
+        tooltip.style.padding = '12px 16px';
+        tooltip.style.borderRadius = '8px';
+        tooltip.style.fontSize = '15px';
+        tooltip.style.maxWidth = '350px';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.boxShadow = '0 2px 12px rgba(0,0,0,0.15)';
+        document.body.appendChild(tooltip);
+    }
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 20) + 'px';
+    tooltip.style.top = (e.clientY + 10) + 'px';
+}
+function hideTooltip() {
+    const tooltip = document.getElementById('customTooltip');
+    if (tooltip) tooltip.style.display = 'none';
 } 

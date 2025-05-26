@@ -134,7 +134,7 @@
             <div class="space-y-8">
                 <!-- Gráfico de Sentimiento (fila completa) -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[600px]">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Análisis de Sentimiento</h3>
+                    <h3 id="sentimentTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 cursor-help">Análisis de Sentimiento</h3>
                     <div id="sentimentChart" class="w-full h-[500px]"></div>
                     <div id="sentimentExplanation" class="mt-4 text-gray-600 dark:text-gray-300 text-sm"></div>
                 </div>
@@ -143,13 +143,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Gráfico de Radar -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[500px]">
-                        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Orientación Política</h3>
+                        <h3 id="radarTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 cursor-help">Orientación Política</h3>
                         <div id="radarChart" class="w-full h-[400px]"></div>
                     </div>
 
                     <!-- Nube de Palabras -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[500px]">
-                        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Nube de Adjetivos</h3>
+                        <h3 id="wordCloudTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 cursor-help">Nube de Adjetivos</h3>
                         <div id="wordCloud" class="w-full h-[400px]"></div>
                     </div>
                 </div>
