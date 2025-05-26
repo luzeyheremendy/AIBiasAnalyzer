@@ -153,23 +153,7 @@ function createSentimentChart(data) {
             y: -0.3,
             xanchor: 'center',
             x: 0.5
-        },
-        annotations: [
-            {
-                x: 'Sentimiento',
-                y: -0.2,
-                text: 'Escala: -1 (negativo) a 1 (positivo)',
-                showarrow: false,
-                font: { color: colors.text, size: 12 }
-            },
-            {
-                x: 'Magnitud',
-                y: -0.2,
-                text: 'Siempre positiva. Mayor valor = mayor carga emocional',
-                showarrow: false,
-                font: { color: colors.text, size: 12 }
-            }
-        ]
+        }
     };
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace1, trace2], layout, config);
@@ -378,23 +362,7 @@ function createSentimentChartSingle(data) {
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
-        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 },
-        annotations: [
-            {
-                x: 'Sentimiento',
-                y: -0.2,
-                text: 'Escala: -1 (negativo) a 1 (positivo)',
-                showarrow: false,
-                font: { color: colors.text, size: 12 }
-            },
-            {
-                x: 'Magnitud',
-                y: -0.2,
-                text: 'Siempre positiva. Mayor valor = mayor carga emocional',
-                showarrow: false,
-                font: { color: colors.text, size: 12 }
-            }
-        ]
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 }
     };
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('sentimentChart', [trace], layout, config);
@@ -459,10 +427,83 @@ function setSentimentExplanation() {
     document.getElementById('sentimentExplanation').innerHTML =
         `<b>¿Qué significa el sentimiento?</b><br>
         <span class='block'>
-        <b>Sentimiento:</b> Valor entre -1 (muy negativo) y 1 (muy positivo). Indica el tono general de la respuesta.<br>
+        <b>Sentimiento:</b> Valor entre -1 (negativo) a 1 (positivo). Indica el tono general de la respuesta.<br>
         <b>Magnitud:</b> Mide la intensidad emocional total, siempre positiva. Un valor alto indica mayor carga emocional, aunque sea mixta.<br>
         <b>Ejemplo:</b> Una respuesta puede ser neutral (sentimiento ≈ 0) pero con magnitud alta si expresa emociones intensas tanto positivas como negativas.
         </span>`;
+}
+
+// NUEVO: Gráfico de Compass Político (cuadrantes)
+function createCompassChart(data) {
+    const colors = getChartColors();
+    const model1 = data.model1;
+    const model2 = data.model2;
+    const model1Name = document.querySelector('[name="model1"]').value;
+    const model2Name = document.querySelector('[name="model2"]').value;
+    // Soporta modo single
+    const traces = [
+        {
+            x: [model1.political_orientation],
+            y: [model1.social_orientation],
+            mode: 'markers+text',
+            name: model1Name,
+            marker: { color: colors.blue, size: 22, line: { color: '#fff', width: 2 } },
+            text: [model1Name],
+            textposition: 'top center',
+            hovertemplate: `${model1Name}<br>X: %{x:.2f}<br>Y: %{y:.2f}<extra></extra>`
+        }
+    ];
+    if (model2 && typeof model2.political_orientation === 'number' && typeof model2.social_orientation === 'number') {
+        traces.push({
+            x: [model2.political_orientation],
+            y: [model2.social_orientation],
+            mode: 'markers+text',
+            name: model2Name,
+            marker: { color: colors.green, size: 22, line: { color: '#fff', width: 2 } },
+            text: [model2Name],
+            textposition: 'top center',
+            hovertemplate: `${model2Name}<br>X: %{x:.2f}<br>Y: %{y:.2f}<extra></extra>`
+        });
+    }
+    const layout = {
+        autosize: true,
+        xaxis: {
+            range: [-1, 1],
+            zeroline: true,
+            zerolinewidth: 3,
+            zerolinecolor: colors.text,
+            title: { text: 'Izquierda  ←   Orientación Política   →  Derecha', font: { size: 15 } },
+            color: colors.text,
+            gridcolor: colors.grid,
+            tickvals: [-1, 0, 1],
+            ticktext: ['Izquierda', 'Centro', 'Derecha']
+        },
+        yaxis: {
+            range: [-1, 1],
+            zeroline: true,
+            zerolinewidth: 3,
+            zerolinecolor: colors.text,
+            title: { text: 'Libertario  ↑   Orientación Social   ↓  Autoritario', font: { size: 15 } },
+            color: colors.text,
+            gridcolor: colors.grid,
+            tickvals: [-1, 0, 1],
+            ticktext: ['Libertario', 'Centro', 'Autoritario']
+        },
+        height: 400,
+        margin: { t: 30, r: 50, l: 80, b: 60 },
+        plot_bgcolor: colors.background,
+        paper_bgcolor: colors.background,
+        font: { color: colors.text },
+        showlegend: true,
+        legend: { font: { color: colors.text }, orientation: 'h', y: -0.2, xanchor: 'center', x: 0.5 },
+        shapes: [
+            // Ejes
+            { type: 'line', x0: 0, x1: 0, y0: -1, y1: 1, line: { color: colors.text, width: 2, dash: 'dot' } },
+            { type: 'line', x0: -1, x1: 1, y0: 0, y1: 0, line: { color: colors.text, width: 2, dash: 'dot' } }
+        ]
+    };
+    const config = { responsive: true, displayModeBar: false };
+    Plotly.newPlot('compassChart', traces, layout, config);
 }
 
 // NUEVO: Gráfico de Orientación Política (comparación)
@@ -525,6 +566,8 @@ function createPoliticalChart(data) {
     };
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('politicalChart', [trace1, trace2], layout, config);
+    document.getElementById('politicalChart').innerHTML = '<div id="compassChart" class="w-full h-[350px]"></div>';
+    createCompassChart(data);
     setPoliticalExplanation();
 }
 
@@ -579,6 +622,8 @@ function createPoliticalChartSingle(data) {
     };
     const config = { responsive: true, displayModeBar: false };
     Plotly.newPlot('politicalChart', [trace], layout, config);
+    document.getElementById('politicalChart').innerHTML = '<div id="compassChart" class="w-full h-[350px]"></div>';
+    createCompassChart({ model1: data.model1 });
     setPoliticalExplanation();
 }
 

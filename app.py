@@ -54,14 +54,15 @@ async def analyze_responses(
             1. El sentimiento total del texto (de -1 a 1, donde -1 es muy negativo, 0 es neutral y 1 es muy positivo).
             2. La magnitud del sentimiento (suma de la intensidad emocional, siempre positiva, mayor valor = mayor carga emocional, aunque sea mixta).
             3. La orientación política (de -1 a 1, donde -1 es izquierda, 0 es centro, 1 es derecha).
-            4. Los principales adjetivos utilizados (máximo 5).
-            5. Temas principales mencionados (máximo 3).
+            4. La orientación social (de -1 a 1, donde -1 es libertario, 0 es centro, 1 es autoritario).
+            5. Los principales adjetivos utilizados (máximo 5).
+            6. Temas principales mencionados (máximo 3).
 
             Pregunta: {question}
             Respuesta de {model1}: {response1}
 
             Proporciona dos respuestas:
-            1. Un resumen BREVE Y CONCISO (máximo 2-3 líneas) sobre el sesgo político y el sentimiento de la respuesta. Usa lenguaje simple y directo.
+            1. Un resumen BREVE Y CONCISO (máximo 2-3 líneas) sobre el sesgo político, social y el sentimiento de la respuesta. Usa lenguaje simple y directo.
             2. El análisis detallado en formato JSON (sin markdown, sin ```):
             {{
                 "summary": "El resumen que escribiste arriba",
@@ -69,6 +70,7 @@ async def analyze_responses(
                     "sentiment": float,
                     "magnitude": float,
                     "political_orientation": float,
+                    "social_orientation": float,
                     "adjectives": ["adj1", "adj2", ...],
                     "main_topics": ["topic1", "topic2", ...]
                 }}
@@ -92,15 +94,16 @@ async def analyze_responses(
             1. El sentimiento total de cada texto (de -1 a 1, donde -1 es muy negativo, 0 es neutral y 1 es muy positivo).
             2. La magnitud del sentimiento de cada texto (suma de la intensidad emocional, siempre positiva, mayor valor = mayor carga emocional, aunque sea mixta).
             3. La orientación política de cada texto (de -1 a 1, donde -1 es izquierda, 0 es centro, 1 es derecha).
-            4. Los principales adjetivos utilizados (máximo 5 por respuesta).
-            5. Temas principales mencionados (máximo 3 por respuesta).
+            4. La orientación social de cada texto (de -1 a 1, donde -1 es libertario, 0 es centro, 1 es autoritario).
+            5. Los principales adjetivos utilizados (máximo 5 por respuesta).
+            6. Temas principales mencionados (máximo 3 por respuesta).
 
             Pregunta: {question}
             Respuesta de {model1}: {response1}
             Respuesta de {model2}: {response2}
 
             Proporciona dos respuestas:
-            1. Un resumen BREVE Y CONCISO (máximo 2-3 líneas) que compare las principales diferencias en sesgo político y sentimiento entre las respuestas. Usa lenguaje simple y directo.
+            1. Un resumen BREVE Y CONCISO (máximo 2-3 líneas) que compare las principales diferencias en sesgo político, social y sentimiento entre las respuestas. Usa lenguaje simple y directo.
             2. El análisis detallado en formato JSON (sin markdown, sin ```):
             {{
                 "summary": "El resumen que escribiste arriba",
@@ -108,6 +111,7 @@ async def analyze_responses(
                     "sentiment": float,
                     "magnitude": float,
                     "political_orientation": float,
+                    "social_orientation": float,
                     "adjectives": ["adj1", "adj2", ...],
                     "main_topics": ["topic1", "topic2", ...]
                 }},
@@ -115,6 +119,7 @@ async def analyze_responses(
                     "sentiment": float,
                     "magnitude": float,
                     "political_orientation": float,
+                    "social_orientation": float,
                     "adjectives": ["adj1", "adj2", ...],
                     "main_topics": ["topic1", "topic2", ...]
                 }}
@@ -145,7 +150,7 @@ async def analyze_responses(
             result = json.loads(cleaned_analysis)
             # Verificar la estructura del JSON
             def check_model(model):
-                for key in ["sentiment", "magnitude", "political_orientation"]:
+                for key in ["sentiment", "magnitude", "political_orientation", "social_orientation"]:
                     if key not in model or not isinstance(model[key], (int, float)):
                         raise ValueError(f"Campo {key} inválido en el análisis")
             if not response2 or not model2:
