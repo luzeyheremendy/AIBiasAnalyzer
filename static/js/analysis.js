@@ -529,7 +529,8 @@ function createCompassChart(data) {
             itemwidth: 120,
             borderwidth: 0,
             itemclick: false,
-            itemdoubleclick: false
+            itemdoubleclick: false,
+            title: { text: '' }
         },
         shapes: [
             // Ejes
@@ -537,21 +538,34 @@ function createCompassChart(data) {
             { type: 'line', x0: -1.1, x1: 1.1, y0: 0, y1: 0, line: { color: colors.text, width: 2, dash: 'dot' } }
         ],
         annotations: [
+            // Extremos, letra pequeña, gris claro, minúscula, bien separados
             {
-                x: -1.13, y: -1.13, xref: 'x', yref: 'y',
-                text: '<b>Izquierda</b>', showarrow: false, font: { size: 22 }, align: 'left'
+                x: -1, y: 0, xref: 'x', yref: 'y',
+                text: '<span style="color:#9ca3af;font-size:13px;">izquierda</span>',
+                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'right',
+                xanchor: 'right', yanchor: 'middle',
+                xshift: -18, yshift: 0
             },
             {
-                x: 1.13, y: -1.13, xref: 'x', yref: 'y',
-                text: '<b>Derecha</b>', showarrow: false, font: { size: 22 }, align: 'right'
+                x: 1, y: 0, xref: 'x', yref: 'y',
+                text: '<span style="color:#9ca3af;font-size:13px;">derecha</span>',
+                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'left',
+                xanchor: 'left', yanchor: 'middle',
+                xshift: 18, yshift: 0
             },
             {
-                x: -1.13, y: 1.13, xref: 'x', yref: 'y',
-                text: '<b>Libertario</b>', showarrow: false, font: { size: 22 }, align: 'left'
+                x: 0, y: 1, xref: 'x', yref: 'y',
+                text: '<span style="color:#9ca3af;font-size:13px;">autoritario</span>',
+                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'center',
+                xanchor: 'center', yanchor: 'bottom',
+                xshift: 0, yshift: 18
             },
             {
-                x: 1.13, y: 1.13, xref: 'x', yref: 'y',
-                text: '<b>Autoritario</b>', showarrow: false, font: { size: 22 }, align: 'right'
+                x: 0, y: -1, xref: 'x', yref: 'y',
+                text: '<span style="color:#9ca3af;font-size:13px;">libertario</span>',
+                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'center',
+                xanchor: 'center', yanchor: 'top',
+                xshift: 0, yshift: -18
             }
         ]
     };
