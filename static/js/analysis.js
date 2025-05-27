@@ -515,7 +515,7 @@ function createCompassChart(data) {
             tickpadding: 20
         },
         height: 500,
-        margin: { t: 80, r: 120, l: 120, b: 80 },
+        margin: { t: 150, r: 150, l: 150, b: 150 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -540,7 +540,7 @@ function createCompassChart(data) {
         annotations: [
             // izquierda (vertical, fuera del gráfico)
             {
-                x: -1.18, y: 0, xref: 'x', yref: 'y',
+                x: -1.08, y: 0, xref: 'x', yref: 'y',
                 text: 'izquierda',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
@@ -549,7 +549,7 @@ function createCompassChart(data) {
             },
             // derecha (vertical, fuera del gráfico)
             {
-                x: 1.18, y: 0, xref: 'x', yref: 'y',
+                x: 1.08, y: 0, xref: 'x', yref: 'y',
                 text: 'derecha',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
@@ -558,7 +558,7 @@ function createCompassChart(data) {
             },
             // autoritario (arriba, fuera del gráfico)
             {
-                x: 0, y: 1.15, xref: 'x', yref: 'y',
+                x: 0, y: 1.08, xref: 'x', yref: 'y',
                 text: 'autoritario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'bottom',
@@ -566,7 +566,7 @@ function createCompassChart(data) {
             },
             // libertario (abajo, fuera del gráfico)
             {
-                x: 0, y: -1.15, xref: 'x', yref: 'y',
+                x: 0, y: -1.08, xref: 'x', yref: 'y',
                 text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
