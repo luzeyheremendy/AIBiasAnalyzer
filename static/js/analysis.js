@@ -477,41 +477,85 @@ function createCompassChart(data) {
     const layout = {
         autosize: true,
         xaxis: {
-            range: [-1, 1],
+            range: [-1.1, 1.1],
             zeroline: true,
             zerolinewidth: 3,
             zerolinecolor: colors.text,
-            title: { text: 'Izquierda  ←   Orientación Política   →  Derecha', font: { size: 15 } },
+            title: { text: '', font: { size: 15 } },
             color: colors.text,
             gridcolor: colors.grid,
             tickvals: [-1, 0, 1],
-            ticktext: ['Izquierda', 'Centro', 'Derecha']
+            ticktext: ['<b>Izquierda</b>', '<b>Centro</b>', '<b>Derecha</b>'],
+            tickfont: { size: 18, family: 'Arial' },
+            tickangle: 0,
+            automargin: true,
+            showline: true,
+            linecolor: colors.text,
+            linewidth: 2,
+            mirror: true,
+            tickpadding: 20
         },
         yaxis: {
-            range: [-1, 1],
+            range: [-1.1, 1.1],
             zeroline: true,
             zerolinewidth: 3,
             zerolinecolor: colors.text,
-            title: { text: 'Libertario  ↑   Orientación Social   ↓  Autoritario', font: { size: 15 } },
+            title: { text: '', font: { size: 15 } },
             color: colors.text,
             gridcolor: colors.grid,
             tickvals: [-1, 0, 1],
-            ticktext: ['Libertario', 'Centro', 'Autoritario']
+            ticktext: ['<b>Libertario</b>', '<b>Centro</b>', '<b>Autoritario</b>'],
+            tickfont: { size: 18, family: 'Arial' },
+            tickangle: 0,
+            automargin: true,
+            showline: true,
+            linecolor: colors.text,
+            linewidth: 2,
+            mirror: true,
+            tickpadding: 20
         },
-        height: 400,
-        margin: { t: 30, r: 50, l: 80, b: 60 },
+        height: 500,
+        margin: { t: 30, r: 80, l: 80, b: 120 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
         showlegend: true,
-        legend: { font: { color: colors.text }, orientation: 'h', y: -0.2, xanchor: 'center', x: 0.5 },
+        legend: {
+            font: { color: colors.text, size: 16 },
+            orientation: 'h',
+            y: -0.25,
+            xanchor: 'center',
+            x: 0.5,
+            itemwidth: 80,
+            borderwidth: 0,
+            itemclick: false,
+            itemdoubleclick: false
+        },
         shapes: [
             // Ejes
-            { type: 'line', x0: 0, x1: 0, y0: -1, y1: 1, line: { color: colors.text, width: 2, dash: 'dot' } },
-            { type: 'line', x0: -1, x1: 1, y0: 0, y1: 0, line: { color: colors.text, width: 2, dash: 'dot' } }
+            { type: 'line', x0: 0, x1: 0, y0: -1.1, y1: 1.1, line: { color: colors.text, width: 2, dash: 'dot' } },
+            { type: 'line', x0: -1.1, x1: 1.1, y0: 0, y1: 0, line: { color: colors.text, width: 2, dash: 'dot' } }
+        ],
+        annotations: [
+            {
+                x: -1.08, y: -1.08, xref: 'x', yref: 'y',
+                text: '<b>Izquierda</b>', showarrow: false, font: { size: 16 }, align: 'left'
+            },
+            {
+                x: 1.08, y: -1.08, xref: 'x', yref: 'y',
+                text: '<b>Derecha</b>', showarrow: false, font: { size: 16 }, align: 'right'
+            },
+            {
+                x: -1.08, y: 1.08, xref: 'x', yref: 'y',
+                text: '<b>Libertario</b>', showarrow: false, font: { size: 16 }, align: 'left'
+            },
+            {
+                x: 1.08, y: 1.08, xref: 'x', yref: 'y',
+                text: '<b>Autoritario</b>', showarrow: false, font: { size: 16 }, align: 'right'
+            }
         ]
     };
-    const config = { responsive: true, displayModeBar: false };
+    const config = { responsive: true, displayModeBar: false, displaylogo: false, modeBarButtonsToRemove: ['toggleSpikelines', 'autoScale2d', 'resetScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'editInChartStudio', 'sendDataToCloud', 'zoom2d', 'pan2d', 'select2d', 'lasso2d'] };
     Plotly.newPlot('compassChart', traces, layout, config);
 }
 
