@@ -484,8 +484,8 @@ function createCompassChart(data) {
             title: { text: '', font: { size: 15 } },
             color: colors.text,
             gridcolor: colors.grid,
-            tickvals: [0],
-            ticktext: ['<b>Centro</b>'],
+            tickvals: [],
+            ticktext: [],
             tickfont: { size: 18, family: 'Arial' },
             tickangle: 0,
             automargin: true,
@@ -503,8 +503,8 @@ function createCompassChart(data) {
             title: { text: '', font: { size: 15 } },
             color: colors.text,
             gridcolor: colors.grid,
-            tickvals: [0],
-            ticktext: ['<b>Centro</b>'],
+            tickvals: [],
+            ticktext: [],
             tickfont: { size: 18, family: 'Arial' },
             tickangle: 0,
             automargin: true,
@@ -515,7 +515,7 @@ function createCompassChart(data) {
             tickpadding: 20
         },
         height: 500,
-        margin: { t: 30, r: 80, l: 80, b: 160 },
+        margin: { t: 80, r: 120, l: 120, b: 80 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -538,34 +538,37 @@ function createCompassChart(data) {
             { type: 'line', x0: -1.1, x1: 1.1, y0: 0, y1: 0, line: { color: colors.text, width: 2, dash: 'dot' } }
         ],
         annotations: [
-            // Extremos, letra pequeña, gris claro, minúscula, bien separados
+            // izquierda (vertical, fuera del gráfico)
             {
-                x: -1, y: 0, xref: 'x', yref: 'y',
-                text: '<span style="color:#9ca3af;font-size:13px;">izquierda</span>',
-                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'right',
-                xanchor: 'right', yanchor: 'middle',
-                xshift: -18, yshift: 0
+                x: -1.18, y: 0, xref: 'x', yref: 'y',
+                text: '<span style="color:#111827;font-size:18px;writing-mode:vertical-rl;transform:rotate(-180deg);">izquierda</span>',
+                showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
+                xanchor: 'center', yanchor: 'middle',
+                xshift: -10, yshift: 0
             },
+            // derecha (vertical, fuera del gráfico)
             {
-                x: 1, y: 0, xref: 'x', yref: 'y',
-                text: '<span style="color:#9ca3af;font-size:13px;">derecha</span>',
-                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'left',
-                xanchor: 'left', yanchor: 'middle',
-                xshift: 18, yshift: 0
+                x: 1.18, y: 0, xref: 'x', yref: 'y',
+                text: '<span style="color:#111827;font-size:18px;writing-mode:vertical-rl;transform:rotate(-180deg);">derecha</span>',
+                showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
+                xanchor: 'center', yanchor: 'middle',
+                xshift: 10, yshift: 0
             },
+            // autoritario (arriba, fuera del gráfico)
             {
-                x: 0, y: 1, xref: 'x', yref: 'y',
-                text: '<span style="color:#9ca3af;font-size:13px;">autoritario</span>',
-                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'center',
+                x: 0, y: 1.15, xref: 'x', yref: 'y',
+                text: '<span style="color:#111827;font-size:18px;">autoritario</span>',
+                showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'bottom',
-                xshift: 0, yshift: 18
+                xshift: 0, yshift: 0
             },
+            // libertario (abajo, fuera del gráfico)
             {
-                x: 0, y: -1, xref: 'x', yref: 'y',
-                text: '<span style="color:#9ca3af;font-size:13px;">libertario</span>',
-                showarrow: false, font: { size: 13, color: '#9ca3af' }, align: 'center',
+                x: 0, y: -1.15, xref: 'x', yref: 'y',
+                text: '<span style="color:#111827;font-size:18px;">libertario</span>',
+                showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
-                xshift: 0, yshift: -18
+                xshift: 0, yshift: 0
             }
         ]
     };
