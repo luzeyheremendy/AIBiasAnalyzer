@@ -541,23 +541,25 @@ function createCompassChart(data) {
             // izquierda (vertical, fuera del gráfico)
             {
                 x: -1.18, y: 0, xref: 'x', yref: 'y',
-                text: '<span style="color:#111827;font-size:18px;writing-mode:vertical-rl;transform:rotate(-180deg);">izquierda</span>',
+                text: 'izquierda',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
-                xshift: -10, yshift: 0
+                xshift: -10, yshift: 0,
+                textangle: -90
             },
             // derecha (vertical, fuera del gráfico)
             {
                 x: 1.18, y: 0, xref: 'x', yref: 'y',
-                text: '<span style="color:#111827;font-size:18px;writing-mode:vertical-rl;transform:rotate(-180deg);">derecha</span>',
+                text: 'derecha',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
-                xshift: 10, yshift: 0
+                xshift: 10, yshift: 0,
+                textangle: 90
             },
             // autoritario (arriba, fuera del gráfico)
             {
                 x: 0, y: 1.15, xref: 'x', yref: 'y',
-                text: '<span style="color:#111827;font-size:18px;">autoritario</span>',
+                text: 'autoritario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'bottom',
                 xshift: 0, yshift: 0
@@ -565,7 +567,7 @@ function createCompassChart(data) {
             // libertario (abajo, fuera del gráfico)
             {
                 x: 0, y: -1.15, xref: 'x', yref: 'y',
-                text: '<span style="color:#111827;font-size:18px;">libertario</span>',
+                text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
                 xshift: 0, yshift: 0
