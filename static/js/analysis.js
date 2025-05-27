@@ -113,7 +113,7 @@ function createSentimentChart(data) {
             data.model1.sentiment.toFixed(2),
             data.model1.magnitude.toFixed(2)
         ],
-        textposition: 'outside',
+        textposition: 'auto',
         hovertemplate: '%{x}: %{y:.2f}<extra>' + model1Name + '</extra>'
     };
     const trace2 = {
@@ -126,7 +126,7 @@ function createSentimentChart(data) {
             data.model2.sentiment.toFixed(2),
             data.model2.magnitude.toFixed(2)
         ],
-        textposition: 'outside',
+        textposition: 'auto',
         hovertemplate: '%{x}: %{y:.2f}<extra>' + model2Name + '</extra>'
     };
     const layout = {
@@ -153,7 +153,7 @@ function createSentimentChart(data) {
             tickfont: { size: 15 }
         },
         height: 400,
-        margin: { t: 50, r: 50, l: 80, b: 80 },
+        margin: { t: 90, r: 50, l: 80, b: 80 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -484,8 +484,8 @@ function createCompassChart(data) {
             title: { text: '', font: { size: 15 } },
             color: colors.text,
             gridcolor: colors.grid,
-            tickvals: [-1, 0, 1],
-            ticktext: ['<b>Izquierda</b>', '<b>Centro</b>', '<b>Derecha</b>'],
+            tickvals: [0],
+            ticktext: ['<b>Centro</b>'],
             tickfont: { size: 18, family: 'Arial' },
             tickangle: 0,
             automargin: true,
@@ -503,8 +503,8 @@ function createCompassChart(data) {
             title: { text: '', font: { size: 15 } },
             color: colors.text,
             gridcolor: colors.grid,
-            tickvals: [-1, 0, 1],
-            ticktext: ['<b>Libertario</b>', '<b>Centro</b>', '<b>Autoritario</b>'],
+            tickvals: [0],
+            ticktext: ['<b>Centro</b>'],
             tickfont: { size: 18, family: 'Arial' },
             tickangle: 0,
             automargin: true,
@@ -515,7 +515,7 @@ function createCompassChart(data) {
             tickpadding: 20
         },
         height: 500,
-        margin: { t: 30, r: 80, l: 80, b: 120 },
+        margin: { t: 30, r: 80, l: 80, b: 160 },
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -523,10 +523,10 @@ function createCompassChart(data) {
         legend: {
             font: { color: colors.text, size: 16 },
             orientation: 'h',
-            y: -0.25,
+            y: -0.35,
             xanchor: 'center',
             x: 0.5,
-            itemwidth: 80,
+            itemwidth: 120,
             borderwidth: 0,
             itemclick: false,
             itemdoubleclick: false
@@ -538,24 +538,35 @@ function createCompassChart(data) {
         ],
         annotations: [
             {
-                x: -1.08, y: -1.08, xref: 'x', yref: 'y',
-                text: '<b>Izquierda</b>', showarrow: false, font: { size: 16 }, align: 'left'
+                x: -1.13, y: -1.13, xref: 'x', yref: 'y',
+                text: '<b>Izquierda</b>', showarrow: false, font: { size: 22 }, align: 'left'
             },
             {
-                x: 1.08, y: -1.08, xref: 'x', yref: 'y',
-                text: '<b>Derecha</b>', showarrow: false, font: { size: 16 }, align: 'right'
+                x: 1.13, y: -1.13, xref: 'x', yref: 'y',
+                text: '<b>Derecha</b>', showarrow: false, font: { size: 22 }, align: 'right'
             },
             {
-                x: -1.08, y: 1.08, xref: 'x', yref: 'y',
-                text: '<b>Libertario</b>', showarrow: false, font: { size: 16 }, align: 'left'
+                x: -1.13, y: 1.13, xref: 'x', yref: 'y',
+                text: '<b>Libertario</b>', showarrow: false, font: { size: 22 }, align: 'left'
             },
             {
-                x: 1.08, y: 1.08, xref: 'x', yref: 'y',
-                text: '<b>Autoritario</b>', showarrow: false, font: { size: 16 }, align: 'right'
+                x: 1.13, y: 1.13, xref: 'x', yref: 'y',
+                text: '<b>Autoritario</b>', showarrow: false, font: { size: 22 }, align: 'right'
             }
         ]
     };
-    const config = { responsive: true, displayModeBar: false, displaylogo: false, modeBarButtonsToRemove: ['toggleSpikelines', 'autoScale2d', 'resetScale2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'editInChartStudio', 'sendDataToCloud', 'zoom2d', 'pan2d', 'select2d', 'lasso2d'] };
+    const config = {
+        responsive: true,
+        displayModeBar: false,
+        displaylogo: false,
+        modeBarButtonsToRemove: [
+            'toggleSpikelines', 'autoScale2d', 'resetScale2d', 'hoverClosestCartesian',
+            'hoverCompareCartesian', 'editInChartStudio', 'sendDataToCloud', 'zoom2d',
+            'pan2d', 'select2d', 'lasso2d'
+        ],
+        showTips: false,
+        staticPlot: false
+    };
     Plotly.newPlot('compassChart', traces, layout, config);
 }
 
