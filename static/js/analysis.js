@@ -520,7 +520,7 @@ function createCompassChart(data, width, height) {
             tickpadding: 20
         },
         // Adjust margins for annotations and legend
-        margin: { t: 80, r: 300, l: 300, b: 300 }, // Further increased left/right margin
+        margin: { t: 80, r: 300, l: 300, b: 300 }, // Generous left/right margin for paper-relative annotations
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -548,33 +548,33 @@ function createCompassChart(data, width, height) {
         annotations: [
             // izquierda (vertical, outside plot area)
             {
-                x: -1.15, y: 0, xref: 'x', yref: 'y',
+                x: -0.05, y: 0.5, xref: 'paper', yref: 'paper', // Position relative to paper
                 text: 'izquierda',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
-                xanchor: 'center', yanchor: 'middle',
-                xshift: -40, yshift: 0, // Further increased xshift
+                xanchor: 'right', yanchor: 'middle', // Anchor point for paper coordinates
+                xshift: 0, yshift: 0,
                 textangle: -90
             },
             // derecha (vertical, outside plot area)
             {
-                x: 1.2, y: 0, xref: 'x', yref: 'y', // Adjusted x position
+                x: 1.05, y: 0.5, xref: 'paper', yref: 'paper', // Position relative to paper
                 text: 'derecha',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
-                xanchor: 'center', yanchor: 'middle',
-                xshift: 40, yshift: 0, // Further increased xshift
+                xanchor: 'left', yanchor: 'middle', // Anchor point for paper coordinates
+                xshift: 0, yshift: 0,
                 textangle: 90
             },
             // autoritario (top, outside plot area)
             {
-                x: 0, y: 1.1, xref: 'x', yref: 'y',
+                x: 0.5, y: 1.05, xref: 'paper', yref: 'paper', // Position relative to paper
                 text: 'autoritario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
-                xanchor: 'center', yanchor: 'bottom',
+                xanchor: 'center', yanchor: 'bottom', // Anchor point for paper coordinates
                 xshift: 0, yshift: 0
             },
             // libertario (bottom, outside plot area)
             {
-                x: 0, y: -1.1, xref: 'x', yref: 'y',
+                x: 0.5, y: -1.1, xref: 'paper', yref: 'paper',
                 text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
