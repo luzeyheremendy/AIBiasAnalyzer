@@ -520,7 +520,7 @@ function createCompassChart(data, width, height) {
             tickpadding: 20
         },
         // Adjust margins for annotations and legend
-        margin: { t: 80, r: 300, l: 300, b: 300 }, // Generous left/right margin for paper-relative annotations
+        margin: { t: 80, r: 350, l: 350, b: 300 }, // Further increased left/right margin
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -548,7 +548,7 @@ function createCompassChart(data, width, height) {
         annotations: [
             // izquierda (vertical, outside plot area)
             {
-                x: -0.05, y: 0.5, xref: 'paper', yref: 'paper', // Position relative to paper
+                x: -0.1, y: 0.5, xref: 'paper', yref: 'paper', // Further adjusted x position relative to paper
                 text: 'izquierda',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'right', yanchor: 'middle', // Anchor point for paper coordinates
@@ -557,7 +557,7 @@ function createCompassChart(data, width, height) {
             },
             // derecha (vertical, outside plot area)
             {
-                x: 1.05, y: 0.5, xref: 'paper', yref: 'paper', // Position relative to paper
+                x: 1.1, y: 0.5, xref: 'paper', yref: 'paper', // Further adjusted x position relative to paper
                 text: 'derecha',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'left', yanchor: 'middle', // Anchor point for paper coordinates
