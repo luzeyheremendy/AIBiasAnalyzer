@@ -552,7 +552,7 @@ function createCompassChart(data, width, height) {
                 text: 'izquierda',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
-                xshift: -10, yshift: 0,
+                xshift: -20, yshift: 0,
                 textangle: -90
             },
             // derecha (vertical, outside plot area)
@@ -561,7 +561,7 @@ function createCompassChart(data, width, height) {
                 text: 'derecha',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
-                xshift: 10, yshift: 0,
+                xshift: 20, yshift: 0,
                 textangle: 90
             },
             // autoritario (top, outside plot area)
