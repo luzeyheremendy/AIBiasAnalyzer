@@ -153,15 +153,26 @@ async def analyze_responses(
                 for key in ["sentiment", "magnitude", "political_orientation", "social_orientation"]:
                     if key not in model or not isinstance(model[key], (int, float)):
                         raise ValueError(f"Campo {key} inválido en el análisis")
+            # Ajustar magnitud según el signo del sentimiento
+            def adjust_magnitude(model):
+                if 'sentiment' in model and 'magnitude' in model:
+                    s = model['sentiment']
+                    m = model['magnitude']
+                    if s == 0:
+                        model['magnitude'] = 0
+                    else:
+                        model['magnitude'] = abs(m) * (1 if s > 0 else -1)
             if not response2 or not model2:
                 if "model1" not in result:
                     raise ValueError("Falta el modelo model1 en la respuesta")
                 check_model(result["model1"])
+                adjust_magnitude(result["model1"])
             else:
                 for model in ["model1", "model2"]:
                     if model not in result:
                         raise ValueError(f"Falta el modelo {model} en la respuesta")
                     check_model(result[model])
+                    adjust_magnitude(result[model])
             return result
         except json.JSONDecodeError as e:
             print(f"Error al decodificar JSON: {e}")

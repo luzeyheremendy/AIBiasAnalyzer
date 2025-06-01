@@ -443,13 +443,14 @@ function createWordCloudSingle(data) {
 }
 
 // NUEVO: Gráfico de Compass Político (cuadrantes)
-function createCompassChart(data) {
+function createCompassChart(data, width, height) {
     const colors = getChartColors();
+
     const model1 = data.model1;
     const model2 = data.model2;
     const model1Name = document.querySelector('[name="model1"]').value;
     const model2Name = document.querySelector('[name="model2"]').value;
-    // Soporta modo single
+
     const traces = [
         {
             x: [model1.political_orientation],
@@ -462,6 +463,8 @@ function createCompassChart(data) {
             hovertemplate: `${model1Name}<br>X: %{x:.2f}<br>Y: %{y:.2f}<extra></extra>`
         }
     ];
+
+    // Only add model2 trace if it exists and has valid data
     if (model2 && typeof model2.political_orientation === 'number' && typeof model2.social_orientation === 'number') {
         traces.push({
             x: [model2.political_orientation],
@@ -474,7 +477,9 @@ function createCompassChart(data) {
             hovertemplate: `${model2Name}<br>X: %{x:.2f}<br>Y: %{y:.2f}<extra></extra>`
         });
     }
+
     const layout = {
+        // Rely on autosize: true and container size (CSS handles explicit dimensions)
         autosize: true,
         xaxis: {
             range: [-1.1, 1.1],
@@ -514,8 +519,8 @@ function createCompassChart(data) {
             mirror: true,
             tickpadding: 20
         },
-        height: 500,
-        margin: { t: 150, r: 150, l: 150, b: 150 },
+        // Adjust margins for annotations and legend
+        margin: { t: 80, r: 150, l: 150, b: 300 }, // Further increased left/right and bottom margin
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -523,14 +528,17 @@ function createCompassChart(data) {
         legend: {
             font: { color: colors.text, size: 16 },
             orientation: 'h',
-            y: -0.35,
+            y: -0.7, // Further lower the legend position
             xanchor: 'center',
             x: 0.5,
-            itemwidth: 120,
+            itemwidth: 300, // Further increase item width
             borderwidth: 0,
             itemclick: false,
             itemdoubleclick: false,
-            title: { text: '' }
+            traceorder: 'normal',
+            bgcolor: 'rgba(0,0,0,0)', // Transparent background
+            itembgcolor: 'rgba(0,0,0,0)', // Transparent item background
+            entrywidth: 300 // Explicitly set entry width
         },
         shapes: [
             // Ejes
@@ -538,35 +546,35 @@ function createCompassChart(data) {
             { type: 'line', x0: -1.1, x1: 1.1, y0: 0, y1: 0, line: { color: colors.text, width: 2, dash: 'dot' } }
         ],
         annotations: [
-            // izquierda (vertical, fuera del gráfico)
+            // izquierda (vertical, outside plot area)
             {
-                x: -1.08, y: 0, xref: 'x', yref: 'y',
+                x: -1.15, y: 0, xref: 'x', yref: 'y',
                 text: 'izquierda',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
                 xshift: -10, yshift: 0,
                 textangle: -90
             },
-            // derecha (vertical, fuera del gráfico)
+            // derecha (vertical, outside plot area)
             {
-                x: 1.08, y: 0, xref: 'x', yref: 'y',
+                x: 1.15, y: 0, xref: 'x', yref: 'y',
                 text: 'derecha',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'middle',
                 xshift: 10, yshift: 0,
                 textangle: 90
             },
-            // autoritario (arriba, fuera del gráfico)
+            // autoritario (top, outside plot area)
             {
-                x: 0, y: 1.08, xref: 'x', yref: 'y',
+                x: 0, y: 1.1, xref: 'x', yref: 'y',
                 text: 'autoritario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'bottom',
                 xshift: 0, yshift: 0
             },
-            // libertario (abajo, fuera del gráfico)
+            // libertario (bottom, outside plot area)
             {
-                x: 0, y: -1.08, xref: 'x', yref: 'y',
+                x: 0, y: -1.1, xref: 'x', yref: 'y',
                 text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
@@ -574,6 +582,7 @@ function createCompassChart(data) {
             }
         ]
     };
+
     const config = {
         responsive: true,
         displayModeBar: false,
@@ -581,133 +590,87 @@ function createCompassChart(data) {
         modeBarButtonsToRemove: [
             'toggleSpikelines', 'autoScale2d', 'resetScale2d', 'hoverClosestCartesian',
             'hoverCompareCartesian', 'editInChartStudio', 'sendDataToCloud', 'zoom2d',
-            'pan2d', 'select2d', 'lasso2d'
+            'pan2d', 'select2d', 'lasso2d',
+            'toImage', // Remove download button too
+            'toggleHover', 'hoverClosest' 
         ],
         showTips: false,
         staticPlot: false
     };
-    Plotly.newPlot('compassChart', traces, layout, config);
+
+    return { traces, layout, config };
 }
 
-// NUEVO: Gráfico de Orientación Política (comparación)
+// Gráfico de Orientación Política (comparación) - Llama a createCompassChart
+let politicalChartObserver = null; // Keep track of the observer
+
 function createPoliticalChart(data) {
-    const colors = getChartColors();
-    const trace1 = {
-        x: ['Orientación Política'],
-        y: [data.model1.political_orientation],
-        name: document.querySelector('[name="model1"]').value,
-        type: 'bar',
-        marker: { color: colors.blue },
-        text: [data.model1.political_orientation.toFixed(2)],
-        textposition: 'auto',
-    };
-    const trace2 = {
-        x: ['Orientación Política'],
-        y: [data.model2.political_orientation],
-        name: document.querySelector('[name="model2"]').value,
-        type: 'bar',
-        marker: { color: colors.green },
-        text: [data.model2.political_orientation.toFixed(2)],
-        textposition: 'auto',
-    };
-    const layout = {
-        barmode: 'group',
-        autosize: true,
-        yaxis: {
-            range: [-1, 1],
-            title: {
-                text: 'Escala (-1 a 1)',
-                font: { size: 14 }
-            },
-            gridcolor: colors.grid,
-            color: colors.text,
-            zerolinecolor: colors.grid,
-            zerolinewidth: 2
-        },
-        xaxis: {
-            color: colors.text,
-            title: {
-                text: 'Orientación Política',
-                font: { size: 14 }
-            }
-        },
-        height: 200,
-        margin: { t: 30, r: 50, l: 80, b: 60 },
-        plot_bgcolor: colors.background,
-        paper_bgcolor: colors.background,
-        font: { color: colors.text },
-        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 },
-        annotations: [
-            {
-                x: 'Orientación Política',
-                y: -1.2,
-                text: 'Izquierda (-1) a Derecha (1)',
-                showarrow: false,
-                font: { color: colors.text, size: 12 }
-            }
-        ]
-    };
-    const config = { responsive: true, displayModeBar: false };
-    Plotly.newPlot('politicalChart', [trace1, trace2], layout, config);
-    document.getElementById('politicalChart').innerHTML = '<div id="compassChart" class="w-full h-[350px]"></div>';
-    createCompassChart(data);
+    const politicalChartDiv = document.getElementById('politicalChart');
+    if (!politicalChartDiv) {
+        console.error('Political chart div not found!');
+        return;
+    }
+    
+    // Disconnect previous observer if it exists
+    if(politicalChartObserver) {
+        politicalChartObserver.disconnect();
+        politicalChartObserver = null;
+    }
+
+    // Clear the div before creating the new chart
+    politicalChartDiv.innerHTML = '';
+    
+    // Get current dimensions - removed explicit passing, relying on autosize with robust container
+    // const containerWidth = politicalChartDiv.clientWidth;
+    // const containerHeight = politicalChartDiv.clientHeight;
+
+    const { traces, layout, config } = createCompassChart(data); // Removed dimension arguments
+    
+    Plotly.newPlot('politicalChart', traces, layout, config);
+
     setPoliticalExplanation();
+    
+    // Use ResizeObserver to ensure the chart redraws when its container resizes
+    politicalChartObserver = new ResizeObserver(() => {
+        Plotly.relayout('politicalChart', { autosize: true });
+    });
+    politicalChartObserver.observe(politicalChartDiv);
 }
 
-// NUEVO: Gráfico de Orientación Política (single)
+// Gráfico de Orientación Política (single) - Llama a createCompassChart
+let politicalChartSingleObserver = null; // Keep track of the observer
+
 function createPoliticalChartSingle(data) {
-    const colors = getChartColors();
-    const trace = {
-        x: ['Orientación Política'],
-        y: [data.model1.political_orientation],
-        name: document.querySelector('[name="model1"]').value,
-        type: 'bar',
-        marker: { color: colors.blue },
-        text: [data.model1.political_orientation.toFixed(2)],
-        textposition: 'auto',
-    };
-    const layout = {
-        barmode: 'group',
-        autosize: true,
-        yaxis: {
-            range: [-1, 1],
-            title: {
-                text: 'Escala (-1 a 1)',
-                font: { size: 14 }
-            },
-            gridcolor: colors.grid,
-            color: colors.text,
-            zerolinecolor: colors.grid,
-            zerolinewidth: 2
-        },
-        xaxis: {
-            color: colors.text,
-            title: {
-                text: 'Orientación Política',
-                font: { size: 14 }
-            }
-        },
-        height: 200,
-        margin: { t: 30, r: 50, l: 80, b: 60 },
-        plot_bgcolor: colors.background,
-        paper_bgcolor: colors.background,
-        font: { color: colors.text },
-        legend: { font: { color: colors.text }, orientation: 'h', y: -0.3, xanchor: 'center', x: 0.5 },
-        annotations: [
-            {
-                x: 'Orientación Política',
-                y: -1.2,
-                text: 'Izquierda (-1) a Derecha (1)',
-                showarrow: false,
-                font: { color: colors.text, size: 12 }
-            }
-        ]
-    };
-    const config = { responsive: true, displayModeBar: false };
-    Plotly.newPlot('politicalChart', [trace], layout, config);
-    document.getElementById('politicalChart').innerHTML = '<div id="compassChart" class="w-full h-[350px]"></div>';
-    createCompassChart({ model1: data.model1 });
+    const politicalChartDiv = document.getElementById('politicalChart');
+    if (!politicalChartDiv) {
+        console.error('Political chart div not found!');
+        return;
+    }
+
+     // Disconnect previous observer if it exists
+     if(politicalChartSingleObserver) {
+        politicalChartSingleObserver.disconnect();
+        politicalChartSingleObserver = null;
+    }
+
+    // Clear the div before creating the new chart
+    politicalChartDiv.innerHTML = '';
+    
+    // Get current dimensions - removed explicit passing, relying on autosize with robust container
+    // const containerWidth = politicalChartDiv.clientWidth;
+    // const containerHeight = politicalChartDiv.clientHeight;
+
+    const { traces, layout, config } = createCompassChart({ model1: data.model1 }); // Removed dimension arguments
+
+    Plotly.newPlot('politicalChart', traces, layout, config);
+
     setPoliticalExplanation();
+     
+     // Use ResizeObserver to ensure the chart redraws when its container resizes
+    politicalChartSingleObserver = new ResizeObserver(() => {
+        Plotly.relayout('politicalChart', { autosize: true });
+    });
+    politicalChartSingleObserver.observe(politicalChartDiv);
 }
 
 // NUEVO: Explicación para orientación política

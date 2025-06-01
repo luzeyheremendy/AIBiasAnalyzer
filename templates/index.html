@@ -39,6 +39,19 @@
             border-left-color: #3b82f6;
         }
     </style>
+    <style>
+        /* Ensure charts take full container width */
+        #politicalChart .js-plotly-plot,
+        #sentimentChart .js-plotly-plot,
+        #radarChart .js-plotly-plot,
+        #wordCloud .js-plotly-plot {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        #politicalChart {
+            width: 100% !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100">
     <div class="container mx-auto px-4 py-8 mb-12">
@@ -140,9 +153,9 @@
                 </div>
 
                 <!-- Gráfico de Orientación Política (fila completa) -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[600px] h-auto mb-16 mt-16 flex flex-col justify-center">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 backdrop-blur-sm min-h-[800px] h-auto mb-16 mt-16 flex flex-col justify-center">
                     <h3 id="politicalTitle" class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 cursor-help">Orientación Política</h3>
-                    <div id="politicalChart" class="w-full h-full min-h-[500px]"></div>
+                    <div id="politicalChart" class="w-full h-full min-h-[700px]"></div>
                     <div id="politicalExplanation" class="mt-4 text-gray-600 dark:text-gray-300 text-sm"></div>
                 </div>
 
