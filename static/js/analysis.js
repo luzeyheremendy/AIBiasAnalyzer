@@ -576,7 +576,7 @@ function createCompassChart(data, width, height) {
             },
             // libertario (bottom, outside plot area)
             {
-                x: 0.5, y: -1.2, xref: 'paper', yref: 'paper', // Further adjusted y position relative to paper
+                x: 0.5, y: -1.05, xref: 'paper', yref: 'paper', // Adjusted y position relative to paper
                 text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
