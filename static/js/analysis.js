@@ -520,7 +520,7 @@ function createCompassChart(data, width, height) {
             tickpadding: 20
         },
         // Adjust margins for annotations and legend
-        margin: { t: 80, r: 400, l: 400, b: 300 }, // Further increased left/right margin
+        margin: { t: 80, r: 400, l: 400, b: 350 }, // Further increased bottom margin
         plot_bgcolor: colors.background,
         paper_bgcolor: colors.background,
         font: { color: colors.text },
@@ -574,7 +574,7 @@ function createCompassChart(data, width, height) {
             },
             // libertario (bottom, outside plot area)
             {
-                x: 0.5, y: -1.1, xref: 'paper', yref: 'paper',
+                x: 0.5, y: -1.2, xref: 'paper', yref: 'paper', // Further adjusted y position relative to paper
                 text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
