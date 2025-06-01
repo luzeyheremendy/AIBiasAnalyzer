@@ -52,7 +52,7 @@ async def analyze_responses(
             analysis_template = """
             Analiza la siguiente respuesta sobre política argentina y determina:
             1. El sentimiento total del texto (de -1 a 1, donde -1 es muy negativo, 0 es neutral y 1 es muy positivo).
-            2. La magnitud del sentimiento (suma de la intensidad emocional, siempre positiva, mayor valor = mayor carga emocional, aunque sea mixta).
+            2. La magnitud del sentimiento (suma de la intensidad emocional, valor entre 0 y 1, mayor valor = mayor carga emocional).
             3. La orientación política (de -1 a 1, donde -1 es izquierda, 0 es centro, 1 es derecha).
             4. La orientación social (de -1 a 1, donde -1 es libertario, 0 es centro, 1 es autoritario).
             5. Los principales adjetivos utilizados (máximo 5).
@@ -92,7 +92,7 @@ async def analyze_responses(
             analysis_template = """
             Analiza el siguiente par de respuestas sobre política argentina y determina:
             1. El sentimiento total de cada texto (de -1 a 1, donde -1 es muy negativo, 0 es neutral y 1 es muy positivo).
-            2. La magnitud del sentimiento de cada texto (suma de la intensidad emocional, siempre positiva, mayor valor = mayor carga emocional, aunque sea mixta).
+            2. La magnitud del sentimiento de cada texto (suma de la intensidad emocional, valor entre 0 y 1, mayor valor = mayor carga emocional).
             3. La orientación política de cada texto (de -1 a 1, donde -1 es izquierda, 0 es centro, 1 es derecha).
             4. La orientación social de cada texto (de -1 a 1, donde -1 es libertario, 0 es centro, 1 es autoritario).
             5. Los principales adjetivos utilizados (máximo 5 por respuesta).
