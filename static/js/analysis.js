@@ -540,7 +540,7 @@ function createCompassChart(data, width, height) {
             traceorder: 'normal',
             bgcolor: 'rgba(0,0,0,0)', // Transparent background
             itembgcolor: 'rgba(0,0,0,0)', // Transparent item background
-            entrywidth: 300 // Explicitly set entry width
+            entrywidth: 350 // Explicitly set entry width
         },
         shapes: [
             // Ejes
@@ -576,7 +576,7 @@ function createCompassChart(data, width, height) {
             },
             // libertario (bottom, outside plot area)
             {
-                x: 0.5, y: -1.05, xref: 'paper', yref: 'paper', // Adjusted y position relative to paper
+                x: 0.5, y: -0.08, xref: 'paper', yref: 'paper', // Adjusted y position relative to paper
                 text: 'libertario',
                 showarrow: false, font: { size: 18, color: '#111827' }, align: 'center',
                 xanchor: 'center', yanchor: 'top',
