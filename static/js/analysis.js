@@ -141,7 +141,7 @@ function createSentimentChart(data) {
             color: colors.text,
             zerolinecolor: colors.grid,
             zerolinewidth: 2,
-            rangemode: 'tozero',
+            range: [-1, 1],
             automargin: true
         },
         xaxis: {
@@ -368,7 +368,9 @@ function createSentimentChartSingle(data) {
             gridcolor: colors.grid,
             color: colors.text,
             zerolinecolor: colors.grid,
-            zerolinewidth: 2
+            zerolinewidth: 2,
+            range: [-1, 1],
+            automargin: true
         },
         xaxis: {
             color: colors.text,
